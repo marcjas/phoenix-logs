@@ -211,7 +211,8 @@ class DownloadGameId(object):
                 is_processed int,
                 was_error int,
                 log_content text,
-                log_hash text
+                log_hash text,
+                exported int
             );
             """
             )
@@ -221,6 +222,7 @@ class DownloadGameId(object):
             cursor.execute("CREATE INDEX is_processed_index ON logs (is_processed);")
             cursor.execute("CREATE INDEX was_error_index ON logs (was_error);")
             cursor.execute("CREATE INDEX log_hash ON logs (log_hash);")
+            cursor.execute("CREATE INDEX exported ON logs (exported);")
 
             cursor.execute(
                 """
@@ -238,9 +240,12 @@ class DownloadGameId(object):
             cursor = connection.cursor()
 
             for item in results:
+                if item["is_tonpusen"] == 1 or item["is_sanma"] == 1:
+                    continue
+
                 cursor.execute(
-                    "INSERT INTO logs (log_id, date, is_tonpusen, is_sanma, is_processed, was_error, log_content, log_hash) "
-                    'VALUES (?, ?, ?, ?, 0, 0, "", "");',
+                    "INSERT INTO logs (log_id, date, is_tonpusen, is_sanma, is_processed, was_error, log_content, log_hash, exported) "
+                    'VALUES (?, ?, ?, ?, 0, 0, "", "", 0);',
                     [
                         item["log_id"],
                         item["game_date"],

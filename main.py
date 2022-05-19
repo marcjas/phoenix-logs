@@ -7,6 +7,7 @@ from datetime import datetime
 
 from download_game_ids import DownloadGameId
 from download_logs_content import DownloadLogContent
+from export import Export
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 logs_directory = os.path.join(current_directory, "temp")
@@ -61,6 +62,8 @@ def main():
         DownloadGameId(logs_directory, db_file, historical_download, opts.start).process()
     elif opts.action == "content":
         DownloadLogContent(db_file, opts.limit, opts.threads).process()
+    elif opts.action == "export":
+        Export(db_file).process()
     else:
         print("Unknown action")
 

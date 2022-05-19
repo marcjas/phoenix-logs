@@ -88,6 +88,7 @@ class DownloadLogContent(object):
                 },
             )
             binary_content = response.content
+
             # it can be an error page
             if "mjlog" not in response.text:
                 print("There is no log content in response")
@@ -101,19 +102,9 @@ class DownloadLogContent(object):
         with connection:
             cursor = connection.cursor()
 
-            compressed_content = ""
-            log_hash = ""
-            if not was_error:
-                try:
-                    compressed_content = bz2.compress(binary_content)
-                    log_hash = hashlib.sha256(compressed_content).hexdigest()
-                except:
-                    print("Cant compress log content")
-                    was_error = True
-
             cursor.execute(
-                "UPDATE logs SET is_processed = ?, was_error = ?, log_content = ?, log_hash = ? WHERE log_id = ?;",
-                [1, was_error and 1 or 0, compressed_content, log_hash, log_id],
+                "UPDATE logs SET is_processed = ?, was_error = ?, log_content = ?, log_hash = ?, exported = ? WHERE log_id = ?;",
+                [1, was_error and 1 or 0, binary_content, "", 0, log_id],
             )
 
     def load_not_processed_logs(self):
